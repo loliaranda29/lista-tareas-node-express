@@ -9,6 +9,12 @@ app.use(express.static('public'));
 
 const tasks = [];
 
+const listViewRouter = require('./list-view-router');
+const listEditRouter = require('./list-edit-router');
+
+app.use('/list-view', listViewRouter);
+app.use('/list-edit', listEditRouter);
+
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/index.html');
 });
