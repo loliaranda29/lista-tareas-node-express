@@ -1,37 +1,85 @@
 const express = require('express');
-const router = express.Router();
+const listEditRouter = express.Router();
 
-router.post('/create', (req, res) => {
-  const description = req.body.description;
-  if (description) {
-    const id = uuidv4();
-    tasks.push({ id, description, completed: false });
-    res.status(201).json({ id });
-  } else {
-    res.status(400).json({ error: 'Descripción de tarea no proporcionada.' });
-  }
+//LISTA DE TAREAS
+const tasks = [
+  {
+    id: '1',
+    isCompleted: true,
+    description: 'Limpiar',
+  },
+  {
+    id: '2',
+    isCompleted: false,
+    description: 'Hacer la comida',
+  },
+  {
+    id: '3',
+    isCompleted: false,
+    description: 'Estudiar',
+  },
+  {
+    id: '4',
+    isCompleted: true,
+    description: 'Hacer bicicleta',
+  },
+  {
+    id: '5',
+    isCompleted: true,
+    description: 'Hacer trabajos',
+  },
+];
+
+
+listEditRouter.use((req, res, next) => {
+    if ((req.method === 'POST' || req.method === 'PUT') && !req.body) {
+      return res.status(400).send("Solicitud con cuerpo vacío.");
+    }
+  
+    if (req.method === 'POST' || req.method === 'PUT') {
+      const { id, isCompleted, description } = req.body;
+      if (!id || typeof isCompleted !== 'boolean' || !description) {
+        return res.status(400).send("Solicitud con información no válida o atributos faltantes para crear tareas.");
+      }
+    }
+  
+    next();
+  });
+
+
+  //CREAR TAREAR
+listEditRouter.post('/create', (req, res) => {
+  const newTask = req.body; 
+  tasks.push(newTask);
+  res.json(newTask);
 });
 
-router.delete('/delete/:id', (req, res) => {
+//ELIMINAR TAREA
+listEditRouter.delete('/delete/:id', (req, res) => {
   const taskId = req.params.id;
-  const taskIndex = tasks.findIndex((t) => t.id === taskId);
+  const taskIndex = tasks.findIndex(task => task.id === taskId);
+
   if (taskIndex !== -1) {
     tasks.splice(taskIndex, 1);
-    res.status(204).send();
+    res.json({ message: 'Tarea eliminada correctamente' });
   } else {
-    res.status(400).json({ error: 'ID de tarea no válido.' });
+    res.status(404).json({ error: 'Tarea no encontrada' });
   }
 });
 
-router.put('/update/:id', (req, res) => {
+//ACTUALIZAR TAREAS
+listEditRouter.put('/update/:id', (req, res) => {
   const taskId = req.params.id;
-  const task = tasks.find((t) => t.id === taskId);
-  if (task) {
-    task.completed = !task.completed;
-    res.json(task);
+  const updatedTask = req.body; 
+
+  const taskIndex = tasks.findIndex(task => task.id === taskId);
+
+  if (taskIndex !== -1) {
+    tasks[taskIndex] = { ...tasks[taskIndex], ...updatedTask };
+    res.json(tasks[taskIndex]);
   } else {
-    res.status(400).json({ error: 'ID de tarea no válido.' });
+    res.status(404).json({ error: 'Tarea no encontrada' });
   }
 });
 
-module.exports = router;
+module.exports = listEditRouter;
