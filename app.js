@@ -1,25 +1,23 @@
 const express = require('express');
 const app = express();
+const port = 8000;
 
-const tareas = [
-  {
-    id: '1',
-    completo: true,
-    descripcion: 'Hacer las tareas',
-  },
-  {
-    id: '2',
-    completo: false,
-    descripcion: 'Estudiar',
-  },
-];
+require('dotenv').config();
+const jwt = require('jsonwebtoken');
 
-app.get('/tareas', (req, res) => {
-  res.json(tareas);
+const taskFunctionsRouter = require('./taskFunctions');
+
+app.use(express.json());
+
+app.use('/api', taskFunctionsRouter);
+
+app.use((req, res, next) => {
+  if (req.method !== 'GET' && req.method !== 'POST' && req.method !== 'PUT' && req.method !== 'DELETE') {
+    return res.status(405).send("Método no permitido.");
+  }
+  next();
 });
 
-const PORT = 3000;
-
-app.listen(PORT, () => {
-  console.log(`Servidor Express en ejecución en el puerto ${PORT}`);
+app.listen(port, () => {
+  console.log(`Servidor funcionando en el puerto: ${port}`);
 });
