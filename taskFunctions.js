@@ -6,8 +6,14 @@ const router = express.Router();
 const users = [
   { username: 'user1', password: 'password1' },
   { username: 'user2', password: 'password2' },
+
 ];
 
+const tasks = [
+    { id: '1', isCompleted: true, description: 'Hacer bicicleta'},
+    { id: '2', isCompleted: false, description: 'Pagar servicios'},
+    { id: '3', isCompleted: false, description: 'Comprar'},
+  ];
 
 function authenticateUser(req, res, next) {
   const { username, password } = req.body;
@@ -22,7 +28,6 @@ function authenticateUser(req, res, next) {
   req.token = token;
   next();
 }
-
 
 router.post('/login', authenticateUser, (req, res) => {
   res.json({ message: 'Ruta protegida de login', token: req.token });
